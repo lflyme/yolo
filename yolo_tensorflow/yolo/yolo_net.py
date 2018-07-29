@@ -24,7 +24,8 @@ class YOLONet(object):
 		self.scale = 1.0 * self.image_size / self.cell_size #缩放比
 		self.boundary1 = self.cell_size * self.cell_size * self.num_class #类别的维度边界
 		self.boundary2 = self.boundary1 +\
-			self.cell_size * self.cell_size * self.boxes_per_cell #box维度的边界
+			self.cell_size * self.cell_size * self.boxes_per_cell
+			#box维度的边界
 		
 		self.object_scale = cfg.OBJECT_SCALE
 		self.noobject_scale = cfg.NOOBJECT_SCALE
@@ -63,6 +64,17 @@ class YOLONet(object):
 					keep_prob = 0.5,
 					is_training = True,
 					scope = 'yolo'):
+		
+		with tf.variable_scope(scope):
+			with slim.arg_scope(
+				[slim.conv2d,slim.fully_connected],
+				actiivation_fn = leaky_relu(alpha),
+				weights_regularizer = slim.l2_regularizer(0.0005),
+				weights_initializer = tf.truncated_normal_initializer(0.0,0.01)):
+					net = tf.pad(
+						images,np.array([[0,0],[3,3],[3,3],[0,0]]),
+						name = 'pad_1') #对输入数据的宽高进行拓展
+					net = slim.conv2d(net,64,7,2,padding = 'VALID',scope = 'conv_2')
 		
 		
 
