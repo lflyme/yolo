@@ -113,7 +113,9 @@ class YOLONet(object):
 					net = slim.fully_connected(net,num_outputs,activation_fn = None,scope = 'fc_36')
 					
 			return net
-			
+		
+	def calc_iou(self,boxes1,boxes2,scope = 'iou'):
+		
 					
 					
 		
