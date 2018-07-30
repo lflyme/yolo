@@ -18,6 +18,38 @@ class pascal_voc(object):
 		self.class_to_ind = dict(zip(self.classes,range(len(self.classes))))
 		self.flipped = cfg.FLIPPED
 		self.phase = phase
-		self.rebuild = 
+		self.rebuild = rebuild
+		self.cursor = 0
+		self.epoch = 1
+		self.gt_labels = None
+		self.prepare()
+		
+	def get(self):
+		images = np.zeros((self.batch_size,self.image_size,self.image_size,3))
+		labels = np.zeros((self.batch_size,self.cell_size,self.cell_size,25))
+		count = 0
+		while count < self.batch_size:
+			imname = self.gt_labels[self.cursor]['imname']
+			flipped = self.gt_labels[self.cursor]['flipped']
+	
+	def prepare(self):
+		gt_labels = self.load_labels()
+		
+		
+	def load_labels(self):
+		cache_file = os.path.join(self.cache_path,'pascal_' + self.phase + '_gt_labels.pkl')
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 
 
