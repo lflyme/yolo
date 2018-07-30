@@ -19,7 +19,7 @@ class YOLONet(object):
 		self.cell_size = cfg.CELL_SIZE
 		self.boxes_per_cell = cfg.BOXES_PER_CELL
 		self.output_size = (self.cell_size * self.cell_size) * \
-			(self.num_class + self.boxes_per_cell * 5)
+			(self.num_class + self.boxes_per_cell * 5) #7*7*(20 + 2 * 5)
 			
 		self.scale = 1.0 * self.image_size / self.cell_size #缩放比
 		self.boundary1 = self.cell_size * self.cell_size * self.num_class #类别的维度边界
@@ -116,7 +116,33 @@ class YOLONet(object):
 		
 	def calc_iou(self,boxes1,boxes2,scope = 'iou'):
 		
-					
+	
+
+
+
+	def loss_layer(self,predicts,labels,scope = 'loss_layer'):
+		with tf.variable_scope(scope):
+			predict_classes = tf.reshape(predicts[:,:self.boundary1],[self.batch_size,self.cell_size,self.cell_size,self.num_class])#网络输出端类别数据
+			predict_scales = tf.reshape(predicts[:,self.boundary1:self.boundary2],[self.batch_size,self.cell_size,self.cell_size,self.boxes_per_cell])#网络输出端置信度
+			predict_boxes = tf.reshape(predicts[:,self.boundary2:],[self.batch_size,self.cell_size,self.cell_size,self.boxes_per_cell,4])#网络输出端box数据
+			
+			response = tf.reshape(labels[...,0],[self.batch_size,self.cell_size,self.cell_size,1])#标签中置信度
+			boxes = tf.reshape(labels[...,1:5],[self.batch_size,self.cell_size,self.cell_size,1,4])#标签中box
+			boxes = tf.tile(boxes,[1,1,1,self.boxes_per_cell,1] / self.image_size)#将label中的box格式转换为与predict中box对应的格式
+			classes = labels[...,5:]#标签中的类别信息
+			
+			offset = tf.reshape(tf.constant(self.offset,dtype = tf.float32),[1,self.cell_size,self.cell_size,self.boxes_per_cell])
+			offset = tf.tile(offset,[self.batch_size,1,1,1])#将offset复制batch_size份
+			offset_tran = tf.transpose(offset,(0,2,1,3))
+			predict_boxes_tran = tf.stack([(predict_boxes[...,0] + offset) / self.cell_size,
+									(predict_boxes[...,1] + offset_tran) / self.cell_size,
+									tf.square(predict_boxes[...,2]),
+									tf.square(predict_boxes[...,3])],axis = -1)
+									
+			iou_predict_truth = self.calc_iou(predict_boxes_tran,boxes)
+			
+			
+			
 					
 		
 		
