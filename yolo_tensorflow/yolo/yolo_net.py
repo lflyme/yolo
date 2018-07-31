@@ -56,7 +56,8 @@ class YOLONet(object):
 			selfs.loss_layer(self.logits,self.labels)
 			self.total_loss = tf.losses.get_total_loss()
 			tf.summary.scalar('total_loss',self.total_loss)
-			
+	
+	#构造网络图
 	def build_network(self,
 					images,
 					num_outputs,
@@ -116,6 +117,12 @@ class YOLONet(object):
 		
 	def calc_iou(self,boxes1,boxes2,scope = 'iou'):
 		
+		with tf.variable_scope(scope):
+			#transform (x_center,y_center,w,h) to (x1,y1,x2,y2)
+			boxes1_t = tf.stack([boxes1[...,0] - boxes1[...,2] / 2.0,
+								boxes1[...,1] - boxes1[...,3] / 2.0,
+								boxes1[...,0] + boxes1[...,2] / 2.0,
+								boxes1[...,1] + boxes1[...,3] / 2.0])
 	
 
 
@@ -126,6 +133,7 @@ class YOLONet(object):
 			predict_scales = tf.reshape(predicts[:,self.boundary1:self.boundary2],[self.batch_size,self.cell_size,self.cell_size,self.boxes_per_cell])#网络输出端置信度
 			predict_boxes = tf.reshape(predicts[:,self.boundary2:],[self.batch_size,self.cell_size,self.cell_size,self.boxes_per_cell,4])#网络输出端box数据
 			
+			#label存储信息的格式：[response boxes classes]
 			response = tf.reshape(labels[...,0],[self.batch_size,self.cell_size,self.cell_size,1])#标签中置信度
 			boxes = tf.reshape(labels[...,1:5],[self.batch_size,self.cell_size,self.cell_size,1,4])#标签中box
 			boxes = tf.tile(boxes,[1,1,1,self.boxes_per_cell,1] / self.image_size)#将label中的box格式转换为与predict中box对应的格式
