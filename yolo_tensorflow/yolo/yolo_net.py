@@ -13,38 +13,40 @@ slim = tf.contrib.slim
 class YOLONet(object):
 	
 	def __init__(self,is_training = True):
-		self.classes = cfg.CLASSES
-		self.num_class = len(self.classes)
-		self.image_size = cfg.IMAGE_SIZE
-		self.cell_size = cfg.CELL_SIZE
-		self.boxes_per_cell = cfg.BOXES_PER_CELL
+		self.classes = cfg.CLASSES #目标类别
+		self.num_class = len(self.classes) #类别数目
+		self.image_size = cfg.IMAGE_SIZE #输入图像的大小
+		self.cell_size = cfg.CELL_SIZE #cell的大小
+		self.boxes_per_cell = cfg.BOXES_PER_CELL #每个cell负责的box数目
 		self.output_size = (self.cell_size * self.cell_size) * \
-			(self.num_class + self.boxes_per_cell * 5) #7*7*(20 + 2 * 5)
+			(self.num_class + self.boxes_per_cell * 5) #输出数据的维度：7*7*(20 + 2 * 5) = 1470
 			
 		self.scale = 1.0 * self.image_size / self.cell_size #缩放比
-		self.boundary1 = self.cell_size * self.cell_size * self.num_class #类别的维度边界
+		
+		#7*7个cell属于20个物体类别的概率 + 98个box  边界
+		self.boundary1 = self.cell_size * self.cell_size * self.num_class 
 		self.boundary2 = self.boundary1 +\
 			self.cell_size * self.cell_size * self.boxes_per_cell
-			#box维度的边界
+			
 		
-		self.object_scale = cfg.OBJECT_SCALE
-		self.noobject_scale = cfg.NOOBJECT_SCALE
-		self.class_scale = cfg.CLASS_SCALE
-		self.coord_scale = cfg.COORD_SCALE
+		self.object_scale = cfg.OBJECT_SCALE #值为1，存在目标的因子
+		self.noobject_scale = cfg.NOOBJECT_SCALE #值为1，不存在目标的因子
+		self.class_scale = cfg.CLASS_SCALE #类别损失函数的因子
+		self.coord_scale = cfg.COORD_SCALE #坐标损失函数的因子
 		
-		self.learning_rate = cfg.LEARNING_RATE
-		self.batch_size = cfg.BATCH_SIZE
-		self.alpha = cfg.ALPHA
+		self.learning_rate = cfg.LEARNING_RATE #学习速率
+		self.batch_size = cfg.BATCH_SIZE #批次大小
+		self.alpha = cfg.ALPHA #alpha
 		
 		#[2,7,7] -> [7,7,2]
 		self.offset = np.transpose(np.reshape(np.array([np.arange(self.cell_size)]),
 						(self.boxes_per_cell,self.cell_size,self.cell_size)),(1,2,0))
 			
-		#输入变量
+		#输入变量 448x448x3 
 		self.images = tf.placeholder(tf.float32,[None,self.image_size,self.image_size,3],
 						name = 'images')
 		
-		#构建网络图
+		#构建网络图,返回预测结果
 		self.logits = self.build_network(self.images,num_outputs = self.output_size,
 						alpha = self.alpha,is_training = is_training)
 						
@@ -59,8 +61,8 @@ class YOLONet(object):
 	
 	#构造网络图
 	def build_network(self,
-					images,
-					num_outputs,
+					images,   #[None,448,448,3]
+					num_outputs,   #[None,7,7,30]
 					alpha,
 					keep_prob = 0.5,
 					is_training = True,
@@ -74,36 +76,36 @@ class YOLONet(object):
 				weights_initializer = tf.truncated_normal_initializer(0.0,0.01)):
 					net = tf.pad(
 						images,np.array([[0,0],[3,3],[3,3],[0,0]]),
-						name = 'pad_1') #对输入数据的宽高进行拓展
-					net = slim.conv2d(net,64,7,2,padding = 'VALID',scope = 'conv_2') #卷积：64个7x7的卷积核，以2为步伐进行滤波
-					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_3')
-					net = slim.conv2d(net,192,3,scope = 'conv_4')
-					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_5')
-					net = slim.conv2d(net,128,1,scope = 'conv_6')
-					net = slim.conv2d(net,256,3,scope = 'conv_7')
-					net = slim.conv2d(net,256,1,scope = 'conv_8')
-					net = slim.conv2d(net,512,3,scope = 'conv_9')
-					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_10')
-					net = slim.conv2d(net,256,1,scope = 'conv_11')
-					net = slim.conv2d(net,512,3,scope = 'conv_12')
-					net = slim.conv2d(net,256,1,scope = 'conv_13')
-					net = slim.conv2d(net,512,3,scope = 'conv_14')
-					net = slim.conv2d(net,256,1,scope = 'conv_15')
-					net = slim.conv2d(net,512,3,scope = 'conv_16')
-					net = slim.conv2d(net,256,1,scope = 'conv_17')
-					net = slim.conv2d(net,512,3,scope = 'conv_18')
-					net = slim.conv2d(net,512,1,scope = 'conv_19')
-					net = slim.conv2d(net,1024,3,scope = 'conv_20')
-					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_21')
-					net = slim.conv2d(net,512,1,scope = 'conv_22')
-					net = slim.conv2d(net,1024,3,scope = 'conv_23')
-					net = slim.conv2d(net,512,1,scope = 'conv_24')
-					net = slim.conv2d(net,1024,3,scope = 'conv_25')
-					net = slim.conv2d(net,1025,3,scope = 'conv_26')
-					net = tf.pad(net,np.array([[0,0],[1,1],[1,1],[0,0]]),name = 'pad_27')
-					net = slim.conv2d(net,1024,3,2,padding = 'VALID',scope = 'conv_28')
-					net = slim.conv2d(net,1024,3,scope = 'conv_29')
-					net = slim.conv2d(net,1024,3,scope = 'conv_30')
+						name = 'pad_1') #对输入数据的宽高进行填充，batch_size和channel不做填充
+					net = slim.conv2d(net,64,7,2,padding = 'VALID',scope = 'conv_2') #conv：64个7x7的卷积核，以2为步伐进行滤波
+					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_3') #pool:最大池化kernel=2,stride = 2,out:224x224x64
+					net = slim.conv2d(net,192,3,scope = 'conv_4') #conv: num_kernel = 192,kernel_size=3,out:224x224x192 
+					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_5') #pool: kernel_size = 2,stride = 2,out:112x112x192
+					net = slim.conv2d(net,128,1,scope = 'conv_6') #conv: num_kernel = 128,kernel_size = 1,out:112x112x128
+					net = slim.conv2d(net,256,3,scope = 'conv_7') #conv: num_kernel = 256,kernel_size = 3,out:112x112x256
+					net = slim.conv2d(net,256,1,scope = 'conv_8') #conv: num_kernel = 256,kernel_size = 1,out:112x112x256
+					net = slim.conv2d(net,512,3,scope = 'conv_9') #conv: num_kernel = 512,kernel_size = 3,out:112x112x512
+					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_10') #pool: kernel_size = 2,stride = 2,out:56x56x512
+					net = slim.conv2d(net,256,1,scope = 'conv_11') #conv: num_kernel = 256,kernel_size = 1,out:56x56x256
+					net = slim.conv2d(net,512,3,scope = 'conv_12') #conv: num_kernel = 512,kernel_size = 3,out:56x56x512
+					net = slim.conv2d(net,256,1,scope = 'conv_13') #conv: num_kernel = 256,kernel_size = 1,out:56x56x256
+					net = slim.conv2d(net,512,3,scope = 'conv_14') #conv: num_kernel = 512,kernel_size = 3,out:56x56x512
+					net = slim.conv2d(net,256,1,scope = 'conv_15') #conv: num_kernel = 256,kernel_size = 1,out:56x56x256
+					net = slim.conv2d(net,512,3,scope = 'conv_16') #conv: num_kernel = 512,kernel_size = 3,out:56x56x512
+					net = slim.conv2d(net,256,1,scope = 'conv_17') #conv: num_kernel = 256,kernel_size = 1,out:56x56x256
+					net = slim.conv2d(net,512,3,scope = 'conv_18') #conv: num_kernel = 512,kernel_size = 3,out:56x56x512
+					net = slim.conv2d(net,512,1,scope = 'conv_19') #conv: num_kernel = 512,kernel_size = 1,out:56x56x512
+					net = slim.conv2d(net,1024,3,scope = 'conv_20') #conv: num_kernel = 1024,kernel_size = 3,out:56x56x1024
+					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_21') #pool:kernel_size = 2,stride = 2,out: 28x28x1024
+					net = slim.conv2d(net,512,1,scope = 'conv_22') #conv: num_kernel = 512,kernel_size = 1,out: 28x28x512
+					net = slim.conv2d(net,1024,3,scope = 'conv_23') #conv: num_kernel = 1024,kernel_size = 3,out:28x28x1024
+					net = slim.conv2d(net,512,1,scope = 'conv_24') #conv: num_kernel = 512,kernel_size = 1,out: 28x28x512
+					net = slim.conv2d(net,1024,3,scope = 'conv_25') #conv: num_kernel = 1024,kernel_size = 3,out:28x28x1024
+					net = slim.conv2d(net,1024,3,scope = 'conv_26') #conv: num_kernel = 1024,kernel_size = 3,out:28x28x1024
+					net = tf.pad(net,np.array([[0,0],[1,1],[1,1],[0,0]]),name = 'pad_27') #对特征图进行填充
+					net = slim.conv2d(net,1024,3,2,padding = 'VALID',scope = 'conv_28') #conv: num_kernel = 1024, kernel_size = 3,stride = 2,out:14x14x1024
+					net = slim.conv2d(net,1024,3,scope = 'conv_29') #conv: num_kernel = 1024,kernel_size = 3,out:14x14x1024
+					net = slim.conv2d(net,1024,3,scope = 'conv_30') #conv: num_kernel = 1024,kernel_size = 3,out:14x14x1024
 					net = tf.transpose(net,[0,3,1,2],name = 'trans_31')
 					net = slim.flatten(net,scope = 'flat_32')
 					net = slim.fully_connected(net,512,scope = 'fc_33')

@@ -1,3 +1,7 @@
+"""
+pascal_voc:主要功能
+对图像数据进行归一化，同时获取相应的标签数据
+"""
 import os
 import xml.etree.ElementTree as ET
 import numpy as np
@@ -49,7 +53,7 @@ class pascal_voc(object):
 		image = cv2.imread(imname)
 		image = cv2.resize(image,(self.image_size,self.image_size))
 		image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB).astype(np.float32)
-		image = (image / 255.0) * 2.0 - 1.0
+		image = (image / 255.0) * 2.0 - 1.0 #数据归一化到[-1,1]
 		
 		if flippedd:
 			image = image[:,::-1,:]#对数据的x维度进行镜像处理
@@ -118,11 +122,13 @@ class pascal_voc(object):
 			
 		
 		
-	#获取图像中目标物体的label信息	
+	#获取每一张图像中目标物体的label信息	
 	def load_pascal_annotation(self,index):
 		
 		imname = os.path.join(self.data_path,'JPEGImages',index + '.jpg')
 		im = cv2.imread(imname)
+		
+		#缩放比
 		h_ratio = 1.0 * self.image_size / im.shape[0]
 		w_ratio = 1.0 * self.image_size / im.shape[1]
 		
