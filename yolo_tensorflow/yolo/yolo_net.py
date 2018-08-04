@@ -77,43 +77,43 @@ class YOLONet(object):
 					net = tf.pad(
 						images,np.array([[0,0],[3,3],[3,3],[0,0]]),
 						name = 'pad_1') #对输入数据的宽高进行填充，batch_size和channel不做填充
-					net = slim.conv2d(net,64,7,2,padding = 'VALID',scope = 'conv_2') #conv：64个7x7的卷积核，以2为步伐进行滤波
-					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_3') #pool:最大池化kernel=2,stride = 2,out:224x224x64
-					net = slim.conv2d(net,192,3,scope = 'conv_4') #conv: num_kernel = 192,kernel_size=3,out:224x224x192 
-					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_5') #pool: kernel_size = 2,stride = 2,out:112x112x192
-					net = slim.conv2d(net,128,1,scope = 'conv_6') #conv: num_kernel = 128,kernel_size = 1,out:112x112x128
-					net = slim.conv2d(net,256,3,scope = 'conv_7') #conv: num_kernel = 256,kernel_size = 3,out:112x112x256
-					net = slim.conv2d(net,256,1,scope = 'conv_8') #conv: num_kernel = 256,kernel_size = 1,out:112x112x256
-					net = slim.conv2d(net,512,3,scope = 'conv_9') #conv: num_kernel = 512,kernel_size = 3,out:112x112x512
-					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_10') #pool: kernel_size = 2,stride = 2,out:56x56x512
-					net = slim.conv2d(net,256,1,scope = 'conv_11') #conv: num_kernel = 256,kernel_size = 1,out:56x56x256
-					net = slim.conv2d(net,512,3,scope = 'conv_12') #conv: num_kernel = 512,kernel_size = 3,out:56x56x512
-					net = slim.conv2d(net,256,1,scope = 'conv_13') #conv: num_kernel = 256,kernel_size = 1,out:56x56x256
-					net = slim.conv2d(net,512,3,scope = 'conv_14') #conv: num_kernel = 512,kernel_size = 3,out:56x56x512
-					net = slim.conv2d(net,256,1,scope = 'conv_15') #conv: num_kernel = 256,kernel_size = 1,out:56x56x256
-					net = slim.conv2d(net,512,3,scope = 'conv_16') #conv: num_kernel = 512,kernel_size = 3,out:56x56x512
-					net = slim.conv2d(net,256,1,scope = 'conv_17') #conv: num_kernel = 256,kernel_size = 1,out:56x56x256
-					net = slim.conv2d(net,512,3,scope = 'conv_18') #conv: num_kernel = 512,kernel_size = 3,out:56x56x512
-					net = slim.conv2d(net,512,1,scope = 'conv_19') #conv: num_kernel = 512,kernel_size = 1,out:56x56x512
-					net = slim.conv2d(net,1024,3,scope = 'conv_20') #conv: num_kernel = 1024,kernel_size = 3,out:56x56x1024
-					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_21') #pool:kernel_size = 2,stride = 2,out: 28x28x1024
-					net = slim.conv2d(net,512,1,scope = 'conv_22') #conv: num_kernel = 512,kernel_size = 1,out: 28x28x512
-					net = slim.conv2d(net,1024,3,scope = 'conv_23') #conv: num_kernel = 1024,kernel_size = 3,out:28x28x1024
-					net = slim.conv2d(net,512,1,scope = 'conv_24') #conv: num_kernel = 512,kernel_size = 1,out: 28x28x512
-					net = slim.conv2d(net,1024,3,scope = 'conv_25') #conv: num_kernel = 1024,kernel_size = 3,out:28x28x1024
-					net = slim.conv2d(net,1024,3,scope = 'conv_26') #conv: num_kernel = 1024,kernel_size = 3,out:28x28x1024
+					net = slim.conv2d(net,64,7,2,padding = 'VALID',scope = 'conv_2') #conv：64个7x7的卷积核，以2为步伐进行滤波,out:224x224*64
+					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_3') #pool:最大池化kernel=2,stride = 2,out:112x112x64
+					net = slim.conv2d(net,192,3,scope = 'conv_4') #conv: num_kernel = 192,kernel_size=3,out:112x112x192 
+					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_5') #pool: kernel_size = 2,stride = 2,out:56x56x192
+					net = slim.conv2d(net,128,1,scope = 'conv_6') #conv: num_kernel = 128,kernel_size = 1,out:56x56x128
+					net = slim.conv2d(net,256,3,scope = 'conv_7') #conv: num_kernel = 256,kernel_size = 3,out:56x56x256
+					net = slim.conv2d(net,256,1,scope = 'conv_8') #conv: num_kernel = 256,kernel_size = 1,out:56x56x256
+					net = slim.conv2d(net,512,3,scope = 'conv_9') #conv: num_kernel = 512,kernel_size = 3,out:56x56x512
+					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_10') #pool: kernel_size = 2,stride = 2,out:28x28x512
+					net = slim.conv2d(net,256,1,scope = 'conv_11') #conv: num_kernel = 256,kernel_size = 1,out:28x28x256
+					net = slim.conv2d(net,512,3,scope = 'conv_12') #conv: num_kernel = 512,kernel_size = 3,out:28x28x512
+					net = slim.conv2d(net,256,1,scope = 'conv_13') #conv: num_kernel = 256,kernel_size = 1,out:28x28x256
+					net = slim.conv2d(net,512,3,scope = 'conv_14') #conv: num_kernel = 512,kernel_size = 3,out:28x28x512
+					net = slim.conv2d(net,256,1,scope = 'conv_15') #conv: num_kernel = 256,kernel_size = 1,out:28x28x256
+					net = slim.conv2d(net,512,3,scope = 'conv_16') #conv: num_kernel = 512,kernel_size = 3,out:28x28x512
+					net = slim.conv2d(net,256,1,scope = 'conv_17') #conv: num_kernel = 256,kernel_size = 1,out:28x28x256
+					net = slim.conv2d(net,512,3,scope = 'conv_18') #conv: num_kernel = 512,kernel_size = 3,out:28x28x512
+					net = slim.conv2d(net,512,1,scope = 'conv_19') #conv: num_kernel = 512,kernel_size = 1,out:28x28x512
+					net = slim.conv2d(net,1024,3,scope = 'conv_20') #conv: num_kernel = 1024,kernel_size = 3,out:28x28x1024
+					net = slim.max_pool2d(net,2,padding = 'SAME',scope = 'pool_21') #pool:kernel_size = 2,stride = 2,out: 14x14x1024
+					net = slim.conv2d(net,512,1,scope = 'conv_22') #conv: num_kernel = 512,kernel_size = 1,out: 14x14x512
+					net = slim.conv2d(net,1024,3,scope = 'conv_23') #conv: num_kernel = 1024,kernel_size = 3,out:14x14x1024
+					net = slim.conv2d(net,512,1,scope = 'conv_24') #conv: num_kernel = 512,kernel_size = 1,out: 14x14x512
+					net = slim.conv2d(net,1024,3,scope = 'conv_25') #conv: num_kernel = 1024,kernel_size = 3,out:14x14x1024
+					net = slim.conv2d(net,1024,3,scope = 'conv_26') #conv: num_kernel = 1024,kernel_size = 3,out:14x14x1024
 					net = tf.pad(net,np.array([[0,0],[1,1],[1,1],[0,0]]),name = 'pad_27') #对特征图进行填充
-					net = slim.conv2d(net,1024,3,2,padding = 'VALID',scope = 'conv_28') #conv: num_kernel = 1024, kernel_size = 3,stride = 2,out:14x14x1024
-					net = slim.conv2d(net,1024,3,scope = 'conv_29') #conv: num_kernel = 1024,kernel_size = 3,out:14x14x1024
-					net = slim.conv2d(net,1024,3,scope = 'conv_30') #conv: num_kernel = 1024,kernel_size = 3,out:14x14x1024
-					net = tf.transpose(net,[0,3,1,2],name = 'trans_31')
-					net = slim.flatten(net,scope = 'flat_32')
-					net = slim.fully_connected(net,512,scope = 'fc_33')
-					net = slim.fully_connected(net,4096,scope = 'fc_34')
+					net = slim.conv2d(net,1024,3,2,padding = 'VALID',scope = 'conv_28') #conv: num_kernel = 1024, kernel_size = 3,stride = 2,out:7x7x1024
+					net = slim.conv2d(net,1024,3,scope = 'conv_29') #conv: num_kernel = 1024,kernel_size = 3,out:7x7x1024
+					net = slim.conv2d(net,1024,3,scope = 'conv_30') #conv: num_kernel = 1024,kernel_size = 3,out:7x7x1024
+					net = tf.transpose(net,[0,3,1,2],name = 'trans_31') #[batchsize channel 7 7]
+					net = slim.flatten(net,scope = 'flat_32') # 
+					net = slim.fully_connected(net,512,scope = 'fc_33') #1x512
+					net = slim.fully_connected(net,4096,scope = 'fc_34') #1x4096
 					net = slim.dropout(
 						net,keep_prob = keep_prob,is_training = is_training,
-						scope = 'dropout_35')
-					net = slim.fully_connected(net,num_outputs,activation_fn = None,scope = 'fc_36')
+						scope = 'dropout_35') #dropout
+					net = slim.fully_connected(net,num_outputs,activation_fn = None,scope = 'fc_36') #1470
 					
 			return net
 		
@@ -121,11 +121,23 @@ class YOLONet(object):
 		
 		with tf.variable_scope(scope):
 			#transform (x_center,y_center,w,h) to (x1,y1,x2,y2)
-			boxes1_t = tf.stack([boxes1[...,0] - boxes1[...,2] / 2.0,
-								boxes1[...,1] - boxes1[...,3] / 2.0,
-								boxes1[...,0] + boxes1[...,2] / 2.0,
-								boxes1[...,1] + boxes1[...,3] / 2.0])
+			boxes1_t = tf.stack([boxes1[...,0] - boxes1[...,2] / 2.0, #x - w / 2
+								boxes1[...,1] - boxes1[...,3] / 2.0,  #y - h / 2
+								boxes1[...,0] + boxes1[...,2] / 2.0,  #x + w / 2
+								boxes1[...,1] + boxes1[...,3] / 2.0], #y + h / 2
+								axis = -1)
+								
+			boxes2_t = tf.stack([boxes2[...,0] - boxes2[...,2] / 2.0,
+								boxes2[...,1] - boxes2[...,3] / 2,
+								boxes2[...,0] + boxes2[...,2] / 2,
+								boxes2[...,1] + boxes2[...,3] / 2],
+								axis = -1)
 	
+			#calculate the boxs1 square and box2 square
+			square1 = boxes1[...,2] * boxes1[...,3]
+			square2 = boxes2[...,2] * boxes2[...,3]
+			
+			union_square = tf.maximum
 
 
 
