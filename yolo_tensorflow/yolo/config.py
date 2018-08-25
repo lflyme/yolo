@@ -46,7 +46,36 @@ CLASS_SCALE = 2.0 #类别的代价因子
 COORD_SCALE = 5.0 #坐标的代价因子
 
 
+#
+# solver parameter
+#
 
+GPU = False
+
+LEARNING_RATE = 0.0001
+
+DECAY_STEPS = 30000
+
+DECAY_RATE = 0.1
+
+STAIRCASE = True
+
+BATCH_SIZE = 45
+
+MAX_ITER = 15000
+
+SUMMARY_ITER = 10
+
+SAVE_ITER = 1000
+
+
+#
+# test parameter
+#
+
+THRESHOLD = 0.2
+
+IOU_THRESHOLD = 0.5
 
 
 
