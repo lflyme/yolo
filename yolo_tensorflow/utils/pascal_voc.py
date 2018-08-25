@@ -94,8 +94,8 @@ class pascal_voc(object):
 			
 		print('processing gt_labels from: ' + self.data_path)
 		
-		if not os.path.exists(self.cache_path)
-			os.makedirs(self.cache_path):
+		if not os.path.exists(self.cache_path):
+            os.makedirs(self.cache_path)
 		
 		if self.phase == 'train':
 			txtname = os.path.join(self.data_path,'ImageSets','Main','trainval.txt')

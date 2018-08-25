@@ -2,7 +2,7 @@
 """
 Created on Sat Jul 28 22:32:26 2018
 
-@author: Administrator
+@author: kuangyongjian
 """
 import numpy as np
 import tensorflow as tf
